@@ -82,10 +82,10 @@ def getNumber(filepath, escape_string):
         if string in filename:
             filename = filename.replace(string, '')
     part = ''
-    if re.search('-CD\d+', filename):
-        part = re.findall('-CD\d+', filename)[0]
-    if re.search('-cd\d+', filename):
-        part = re.findall('-cd\d+', filename)[0]
+    if re.search('-{0,1}(CD|cd)[1-9]{1,2}', filename):
+												
+									 
+        part = re.findall('-{0,1}(CD|cd)\d+', filename)[0]
     filename = filename.replace(part, '')
     filename = str(re.sub("-\d{4}-\d{1,2}-\d{1,2}", "", filename))  # 去除文件名中时间
     filename = str(re.sub("\d{4}-\d{1,2}-\d{1,2}-", "", filename))  # 去除文件名中时间
@@ -98,8 +98,14 @@ def getNumber(filepath, escape_string):
     elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
         if 'FC2' or 'fc2' in filename:
             filename = filename.upper().replace('PPV', '').replace('--', '-')
-        if re.search('\w+-\d+', filename):  # 提取类似mkbd-120番号
-            file_number = re.search('\w+-\d+', filename).group()
+        if re.search(r'[a-zA-Z]{2,6}(-|_)[0-9]{2,5}', filename):  # 提取类似mkbd-120番号
+            filename = filename.replace('_','-')
+            if re.search(r'[a-zA-Z]{2,6}-0{2}[0-9]{3,4}', filename):  # 排除类似 UMD-00613 番号并转换成通用形式
+                file_number = re.search(r'[a-zA-Z]{2,6}-0{2}[0-9]{3,4}', filename).group().replace('00', '', 1)
+            elif re.search(r'[a-zA-Z]{2,6}-[0-9]{2,5}[G-Zg-z]{1}', filename):
+                file_number = re.search(r'[a-zA-Z]{2,6}-[0-9]{2,5}[G-Zg-z]{1}', filename).group()
+            else:
+                file_number = re.search(r'[a-zA-Z]{2,6}-[0-9]{2,5}', filename).group()										  
         elif re.search('\d+[a-zA-Z]+-\d+', filename):  # 提取类似259luxu-1111番号
             file_number = re.search('\d+[a-zA-Z]+-\d+', filename).group()
         elif re.search('\w+-\w\d+', filename):  # 提取类似mkbd-s120番号

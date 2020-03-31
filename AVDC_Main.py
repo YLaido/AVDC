@@ -563,16 +563,16 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         file_name = os.path.splitext(file_name.split('/')[-1])[0]
         mode = self.Ui.comboBox_website.currentIndex() + 1
         try:
-            if '-CD' in file_name or '-cd' in file_name:
+            if len(re.findall('-CD|cd',file_name)) > 0:
                 part = ''
-                if re.search('-CD\d+', file_name):
-                    part = re.findall('-CD\d+', file_name)[0]
-                elif re.search('-cd\d+', file_name):
-                    part = re.findall('-cd\d+', file_name)[0]
+                if re.search('-CD|cd\d+', file_name):
+                    part = re.findall('-CD|cd\d+', file_name)[0]
+													
+															 
                 file_name = file_name.replace(part, '')
             if '-c.' in file_path or '-C.' in file_path:
                 file_name = file_name[0:-2]
-            self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
+            self.add_text_main(str(datetime.now()) + " [!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
             self.Core_Main(file_path, file_name, mode, 0)
         except Exception as error_info:
             self.add_text_main('[-]Error in select_file_thread: ' + str(error_info))
