@@ -85,7 +85,7 @@ def getNumber(filepath, escape_string):
     if re.search('-{0,1}(CD|cd)[1-9]{1,2}', filename):
 												
 									 
-        part = re.findall('-{0,1}(CD|cd)\d+', filename)[0]
+        part = re.search('-{0,1}(CD|cd)\d+', filename)[0]
     filename = filename.replace(part, '')
     filename = str(re.sub("-\d{4}-\d{1,2}-\d{1,2}", "", filename))  # 去除文件名中时间
     filename = str(re.sub("\d{4}-\d{1,2}-\d{1,2}-", "", filename))  # 去除文件名中时间

@@ -141,7 +141,7 @@ def format_part(filename):
 if __name__ == '__main__':
 
     try:
-        target_dir = r"Z:\DJJ-3\KS-1_PT\錵嫁34部合集"
+        target_dir = r"Z:\DJJ-3\KS-1_PT\岬奈奈美(岬ななみ)Nanami Misaki"
         for filename in os.listdir(target_dir):
                 if not os.path.isdir(os.path.join(target_dir,filename)):
                     if check_part_format(filename) or check_name(filename):

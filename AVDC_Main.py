@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QApplication
 from PyQt5.QtCore import pyqtSignal, Qt
 import sys
 import time
+from datetime import datetime
 import os.path
 import requests
 import shutil
@@ -563,12 +564,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         file_name = os.path.splitext(file_name.split('/')[-1])[0]
         mode = self.Ui.comboBox_website.currentIndex() + 1
         try:
-            if len(re.findall('-CD|cd',file_name)) > 0:
+            if '-CD' in file_name or '-cd' in file_name:
                 part = ''
-                if re.search('-CD|cd\d+', file_name):
-                    part = re.findall('-CD|cd\d+', file_name)[0]
-													
-															 
+                if re.search('-(cd|CD)[1-9]', file_name):
+                    part = re.search('-(cd|CD)[1-9]', file_name)[0]
                 file_name = file_name.replace(part, '')
             if '-c.' in file_path or '-C.' in file_path:
                 file_name = file_name[0:-2]

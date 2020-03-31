@@ -2,7 +2,7 @@ import os
 import shutil,traceback
 from os import path
 
-
+#  Bump movies to upper level
 def sort_file(target_dir):
     extensions = ['mp4', 'avi', 'wmv', 'mkv', 'mov', 'rmvb', 'flv', 'mpg', 'iso']
     video_count = 0
@@ -33,7 +33,7 @@ def sort_file(target_dir):
 
 
 if __name__ == '__main__':
-    target_dir = r'Z:\DJJ-3\KS-1_PT\錵嫁34部合集'
+    target_dir = r'Z:\DJJ-3\KS-1_PT\史上最全蒼井空79部合集71.2G\AV'
     sort_file(target_dir)
     print('finished.')
 
