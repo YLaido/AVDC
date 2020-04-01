@@ -2,7 +2,7 @@ import os
 import shutil
 
 if __name__ == '__main__':
-    target_dir = r'Z:\DJJ-3\KS-1_PT\早乙女ゆい 系列'
+    target_dir = r'Z:\DJJ-3\KS-1_PT\Tachibana_Riko'
     for movie_dir in os.listdir(target_dir):
         if os.path.isdir(os.path.join(target_dir, movie_dir)) and len(os.path.join(target_dir, movie_dir)) > 50:
             try:

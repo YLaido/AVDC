@@ -14,7 +14,7 @@ def check_part_format(filename):  # 识别不规范的分集文件名
         return True
     elif re.search('([a-zA-Z]{2,6}-[0-9]{2,5})-0{0,1}[1-9]{1}',filename):  # 匹配 abp-758-2 / abp-758-02这样的分集
         return True
-    elif re.search('([a-zA-Z]{2,6}[0-9]{2,5})-0{0,1}[1-9]{1}',filename):  # 匹配 GIRO02-02这样的分集
+    elif re.search('([a-zA-Z]{2,6}[0-9]{2,4})-0{0,1}[1-9]{1}',filename):  # 匹配 GIRO02-02这样的分集
         return True
     elif re.search('([a-zA-Z]{2,6}-[0-9]{2,5})\s{1,7}[a-zA-Z]{1}', filename):  # 匹配 "IDBD-304   A"这样的分集
         return True
@@ -31,6 +31,8 @@ def check_part_format(filename):  # 识别不规范的分集文件名
     elif re.search('([a-zA-Z]{2,6})[-]{0,1}([0-9]{2,5}).{3,}HD([1-9]{1})', filename):  # 匹配 '(SOE539)FULLHD1' 这样的分集
         return True
     elif re.search('([a-zA-Z]{2,6})[-]{0,1}([0-9]{2,5})HD-([1-9]{1})', filename):# 匹配 IPTD873HD-1.wmv 这样的分集
+        return True
+    elif re.search('([a-zA-Z]{2,6})0{2}([0-9]{3,5})-([0-9]{1})', filename):# 匹配 1dandy00386-0.mp4 这样的分集
         return True
     else:
         return False
@@ -76,10 +78,10 @@ def format_part(filename):
             part = re.search('([a-zA-Z]{2,6}(-{1}|_{1})[0-9]{2,5})(cd|CD)([0-9]{1})',new_name).group(4)  # 提取分集 6
             new_name = serial + '-cd' + part
             case = '4'
-        elif re.search('([a-zA-Z]{2,6}[0-9]{2,5})-0{0,1}[1-9]{1}', new_name):  # 匹配 GIRO02-02 / GIRO02-2这样的分集
-            serial_alph = re.search('([a-zA-Z]{2,6})([0-9]{2,5})-0{0,1}[1-9]{1}',new_name).group(1)  # 提取字母GIRO
-            serial_num = re.search('([a-zA-Z]{2,6})([0-9]{2,5})-0{0,1}[1-9]{1}',new_name).group(2)   # 提取数字02
-            part = re.search('([a-zA-Z]{2,6})([0-9]{2,5})-(0{0,1}[1-9]{1})',new_name).group(3).replace('0','',1)  # 提取分集02
+        elif re.search('([a-zA-Z]{2,6}[0-9]{2,4})-0{0,1}[1-9]{1}', new_name):  # 匹配 GIRO02-02 / GIRO02-2这样的分集
+            serial_alph = re.search('([a-zA-Z]{2,6})([0-9]{2,4})-0{0,1}[1-9]{1}',new_name).group(1)  # 提取字母GIRO
+            serial_num = re.search('([a-zA-Z]{2,6})([0-9]{2,4})-0{0,1}[1-9]{1}',new_name).group(2)   # 提取数字02
+            part = re.search('([a-zA-Z]{2,6})([0-9]{2,4})-(0{0,1}[1-9]{1})',new_name).group(3).replace('0','',1)  # 提取分集02
             new_name = serial_alph + '-' + serial_num + '-cd' + part
             case = '5'
         elif re.search('([a-zA-Z]{2,6})0{2}([0-9]{2,5})hhb([1-9]{1})', new_name):  # 匹配 iptd00781hhb1
@@ -119,6 +121,15 @@ def format_part(filename):
             part = re.search('([a-zA-Z]{2,6})[-]{0,1}([0-9]{2,5})HD-([1-9]{1})', new_name).group(3)
             new_name = serial_alph + '-' + serial_num + '-cd' + part
             case = '11'
+        elif re.search('([a-zA-Z]{2,6})0{2}([0-9]{3,5})-([0-9]{1})', new_name):  # 匹配 1dandy00386-0.mp4 这样的分集
+            serial_alph = re.search('([a-zA-Z]{2,6})0{2}([0-9]{3,5})-([0-9]{1})', new_name).group(1)
+            serial_num = re.search('([a-zA-Z]{2,6})0{2}([0-9]{3,5})-([0-9]{1})', new_name).group(2)
+            part = re.search('([a-zA-Z]{2,6})0{2}([0-9]{3,5})-([0-9]{1})', new_name).group(3).replace('0','')
+            case = '12'
+            if part:  # 判断分集是否为0，为0即只有一集
+                new_name = serial_alph + '-' + serial_num + '-cd' + part
+            else:
+                new_name = serial_alph + '-' + serial_num
         ####################   规范格式化分集  #########################
 
         ####################   规范格式化名称  #########################
@@ -126,13 +137,12 @@ def format_part(filename):
             serial_alph = re.search('([a-zA-Z]{2,6})([0-9]{3,5})\.',new_name).group(1)
             serial_num = re.search('([a-zA-Z]{2,6})([0-9]{3,5})\.',new_name).group(2)
             new_name = serial_alph + '-' +serial_num
-            case = '12'
+            case = '13'
         elif re.search('[a-zA-Z]{2,6}-{0,1}[0-9]{2,5}FHD', new_name):  # 匹配 mide330FHD
             serial_alph = re.search('([a-zA-Z]{2,6})-{0,1}([0-9]{2,5})FHD',new_name).group(1)
             serial_num = re.search('([a-zA-Z]{2,6})-{0,1}([0-9]{2,5})FHD', new_name).group(2)
             new_name = serial_alph + '-' + serial_num
-            case = '13'
-
+            case = '14'
     finally:
         return new_name, case
 
@@ -141,7 +151,7 @@ def format_part(filename):
 if __name__ == '__main__':
 
     try:
-        target_dir = r"Z:\DJJ-3\KS-1_PT\岬奈奈美(岬ななみ)Nanami Misaki"
+        target_dir = r"Z:\781623489-20180821\KS-1_PT\佳苗るか"
         for filename in os.listdir(target_dir):
                 if not os.path.isdir(os.path.join(target_dir,filename)):
                     if check_part_format(filename) or check_name(filename):
