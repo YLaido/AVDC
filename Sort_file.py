@@ -33,7 +33,7 @@ def sort_file(target_dir):
 
 
 if __name__ == '__main__':
-    target_dir = r'Z:\DJJ-3\KS-1_PT\史上最全蒼井空79部合集71.2G\AV'
+    target_dir = r''
     sort_file(target_dir)
     print('finished.')
 

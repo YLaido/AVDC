@@ -21,7 +21,7 @@ def get_config():
 
 # ========================================================================是否为无码
 def is_uncensored(number):
-    if re.match('^\d{4,}', number) or re.match('n\d{4}', number) or 'HEYZO' in number.upper():
+    if re.match('^[0-9]{4,}', number) or re.match('n[0-9]{4}', number) or 'HEYZO' in number.upper():
         return True
     config = get_config()
     prefix_list = str(config['uncensored']['uncensored_prefix']).split('|')
@@ -83,15 +83,14 @@ def getNumber(filepath, escape_string):
             filename = filename.replace(string, '')
     part = ''
     if re.search('-{0,1}(CD|cd)[1-9]{1,2}', filename):
-												
-									 
-        part = re.search('-{0,1}(CD|cd)\d+', filename)[0]
+
+        part = re.search('-{0,1}(CD|cd)[0-9]+', filename)[0]
     filename = filename.replace(part, '')
-    filename = str(re.sub("-\d{4}-\d{1,2}-\d{1,2}", "", filename))  # 去除文件名中时间
-    filename = str(re.sub("\d{4}-\d{1,2}-\d{1,2}-", "", filename))  # 去除文件名中时间
-    if re.search('^\D+.\d{2}.\d{2}.\d{2}', filename):  # 提取欧美番号 sexart.11.11.11
+    filename = str(re.sub("-[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}", "", filename))  # 去除文件名中时间
+    filename = str(re.sub("[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-", "", filename))  # 去除文件名中时间
+    if re.search('^\D+\.[0-9]{2}\.[0-9]{2}\.[0-9]{2}', filename):  # 提取欧美番号 sexart.11.11.11
         try:
-            file_number = re.search('\D+.\d{2}.\d{2}.\d{2}', filename).group()
+            file_number = re.search('\D+.[0-9]{2}.[0-9]{2}.[0-9]{2}', filename).group()
             return file_number
         except:
             return os.path.splitext(filepath.split('/')[-1])[0]
@@ -106,23 +105,23 @@ def getNumber(filepath, escape_string):
                 file_number = re.search(r'[a-zA-Z]{2,6}-[0-9]{2,5}[G-Zg-z]{1}', filename).group()
             else:
                 file_number = re.search(r'[a-zA-Z]{2,6}-[0-9]{2,5}', filename).group()										  
-        elif re.search('\d+[a-zA-Z]+-\d+', filename):  # 提取类似259luxu-1111番号
-            file_number = re.search('\d+[a-zA-Z]+-\d+', filename).group()
-        elif re.search('\w+-\w\d+', filename):  # 提取类似mkbd-s120番号
-            file_number = re.search('\w+-\w\d+', filename).group()
-        elif re.search('\d+-\w+', filename):  # 提取类似 111111-MMMM 番号
-            file_number = re.search('\d+-\w+', filename).group()
-        elif re.search('\d+-\d+', filename):  # 提取类似 111111-000 番号
-            file_number = re.search('\d+-\d+', filename).group()
-        elif re.search('\d+_\d+', filename):  # 提取类似 111111_000 番号
-            file_number = re.search('\d+_\d+', filename).group()
+        elif re.search('[0-9]+[a-zA-Z]+-[0-9]+', filename):  # 提取类似259luxu-1111番号
+            file_number = re.search('[0-9]+[a-zA-Z]+-[0-9]+', filename).group()
+        elif re.search('\w+-\w[0-9]+', filename):  # 提取类似mkbd-s120番号
+            file_number = re.search('\w+-\w[0-9]+', filename).group()
+        elif re.search('[0-9]+-\w+', filename):  # 提取类似 111111-MMMM 番号
+            file_number = re.search('[0-9]+-\w+', filename).group()
+        elif re.search('[0-9]+-[0-9]+', filename):  # 提取类似 111111-000 番号
+            file_number = re.search('[0-9]+-[0-9]+', filename).group()
+        elif re.search('[0-9]+_[0-9]+', filename):  # 提取类似 111111_000 番号
+            file_number = re.search('[0-9]+_[0-9]+', filename).group()
         else:
             file_number = filename
         return file_number
     else:  # 提取不含减号-的番号，FANZA CID 保留ssni00644，将MIDE139改成MIDE-139
         try:
             file_number = os.path.splitext(filename.split('/')[-1])[0]
-            find_num = re.findall(r'\d+', file_number)[0]
+            find_num = re.findall(r'[0-9]+', file_number)[0]
             find_char = re.findall(r'\D+', file_number)[0]
             if len(find_num) <= 4 and len(find_char) > 1:
                 file_number = find_char + '-' + find_num
@@ -147,9 +146,9 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
             if getDataState(json_data) == 0:
                 json_data = json.loads(avsox.main(file_number))
         # =======================================================================259LUXU-1111
-        elif re.match('\d+[a-zA-Z]+-\d+', file_number) or 'SIRO' in file_number.upper():
+        elif re.match('[0-9]+[a-zA-Z]+-[0-9]+', file_number) or 'SIRO' in file_number.upper():
             json_data = json.loads(mgstage.main(file_number))
-            file_number = re.search('[a-zA-Z]+-\d+', file_number).group()
+            file_number = re.search('[a-zA-Z]+-[0-9]+', file_number).group()
             if getDataState(json_data) == 0:
                 json_data = json.loads(jav321.main(file_number))
             if getDataState(json_data) == 0:
@@ -158,14 +157,14 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
                 json_data = json.loads(javbus.main(file_number))
         # =======================================================================FC2-111111
         elif 'FC2' in file_number.upper():
-            json_data = json.loads(fc2fans_club.main(re.search('\d{4,}', file_number).group()))
+            json_data = json.loads(fc2fans_club.main(re.search('[0-9]{4,}', file_number).group()))
             if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
         # =======================================================================ssni00321
-        elif re.match('\D{2,}00\d{3,}', file_number) and '-' not in file_number and '_' not in file_number:
+        elif re.match('\D{2,}00[0-9]{3,}', file_number) and '-' not in file_number and '_' not in file_number:
             json_data = json.loads(dmm.main(file_number))
         # =======================================================================sexart.15.06.14
-        elif re.search('[a-zA-Z]+.\d{2}.\d{2}.\d{2}', file_number):
+        elif re.search('[a-zA-Z]+.[0-9]{2}.[0-9]{2}.[0-9]{2}', file_number):
             json_data = json.loads(javdb.main_us(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(javbus.main_us(file_number))
@@ -178,7 +177,7 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
                 json_data = json.loads(javdb.main(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(avsox.main(file_number))
-    elif re.match('\D{2,}00\d{3,}', file_number) and mode != 7:
+    elif re.match('\D{2,}00[0-9]{3,}', file_number) and mode != 7:
         json_data = {
             'title': '',
             'actor': '',
@@ -191,14 +190,14 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
     elif mode == 4:  # 仅从javbus
         if isuncensored:
             json_data = json.loads(javbus.main_uncensored(file_number))
-        elif re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
+        elif re.search('\D+.[0-9]{2}.[0-9]{2}.[0-9]{2}', file_number):
             json_data = json.loads(javbus.main_us(file_number))
         else:
             json_data = json.loads(javbus.main(file_number))
     elif mode == 5:  # 仅从jav321
         json_data = json.loads(jav321.main(file_number, isuncensored))
     elif mode == 6:  # 仅从javdb
-        if re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
+        if re.search('\D+.[0-9]{2}.[0-9]{2}.[0-9]{2}', file_number):
             json_data = json.loads(javdb.main_us(file_number))
         else:
             json_data = json.loads(javdb.main(file_number, isuncensored))
@@ -358,3 +357,4 @@ def save_config(json_config):
         print("# 0 : official, 1 : cut", file=code)
 
     code.close()
+

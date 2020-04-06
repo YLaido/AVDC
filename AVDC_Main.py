@@ -571,7 +571,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 file_name = file_name.replace(part, '')
             if '-c.' in file_path or '-C.' in file_path:
                 file_name = file_name[0:-2]
-            self.add_text_main(str(datetime.now()) + " [!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
+            self.add_text_main(" [!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
             self.Core_Main(file_path, file_name, mode, 0)
         except Exception as error_info:
             self.add_text_main('[-]Error in select_file_thread: ' + str(error_info))
@@ -1475,7 +1475,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[!] - ' + str(self.count_claw) + ' - ' + percentage + ' - [' + str(count) + '/' + count_all + '] -')
             try:
                 movie_number = getNumber(movie, escape_string)
-                self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + movie_number + "]")
+                self.add_text_main(str(datetime.now()) + " [!]Making Data for   [" + movie + "], the number is [" + movie_number + "]")
                 result = self.Core_Main(movie, movie_number, mode, count)
                 if result != 'not found' and movie_number != '' and result != 'error':
                     node = QTreeWidgetItem(self.item_succ)

@@ -2,9 +2,9 @@ import os
 import shutil
 
 if __name__ == '__main__':
-    target_dir = r'Z:\DJJ-3\KS-1_PT\Tachibana_Riko'
+    target_dir = r''
     for movie_dir in os.listdir(target_dir):
-        if os.path.isdir(os.path.join(target_dir, movie_dir)) and len(os.path.join(target_dir, movie_dir)) > 50:
+        if os.path.isdir(os.path.join(target_dir, movie_dir)) and len(os.path.join(target_dir, movie_dir)) > 40:
             try:
                 os.rename(os.path.join(target_dir,movie_dir),os.path.join(target_dir,movie_dir[:40]))
                 print(os.path.join(target_dir,movie_dir) + '\nhas been renamed to\n' + os.path.join(target_dir,movie_dir[:40]))

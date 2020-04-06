@@ -3,11 +3,12 @@ import re
 import time
 import traceback
 
-ads = ['3xplanet', '3XPLANET', '.com', '.net','.COM','.NET','.la','.me','.1080p','.720p','.cc','SIS001','sis001','-720p','-1080p']
+ads = ['3xplanet', '3XPLANET', '.com', '.net','.COM','.NET','.la','.me','.1080p','.720p','.cc','SIS001','sis001','-720p','-1080p','.HD','FHD','hjd2048','456k.me','psk.la']
 
 def check_part_format(filename):  # 识别不规范的分集文件名
-    if any(ad in filename for ad in ads):   # 去掉3xplanet之类的广告字符
-        filename = filename.replace(next((ad for ad in ads if ad in filename)),'')
+    for ad in ads:
+        if ad in filename:
+            filename = filename.replace(ad,'')
     if '_' in filename:
         filename = filename.replace('_','-')
     if re.search('([a-zA-Z]{2,6}-[0-9]{2,5})-{0,1}[a-fA-F]{1}\.', filename):  # 匹配 MIDE-123B / MIDE-123-B这样的分集
@@ -28,24 +29,34 @@ def check_part_format(filename):  # 识别不规范的分集文件名
         return True
     elif re.search('([a-zA-Z]{2,6})-([0-9]{2,5}).{4,}-([1-9]{1,2})\.', filename): #  匹配 (PRESTIGE)(SOR-018)浜辺の美少女を、本気でヤッちゃいました。2014 vol.3_2.wmv 这样的分集，注意_已被替换成-
         return True
+    elif re.search('([a-zA-Z]{2,6})-([0-9]{2,5}).{4,}-([a-gA-G]{1})\.', filename): #  匹配 SUPD-106 - DIGITAL CHANNEL DC106 石原莉奈-A.wmv 这样的分集
+        return True
     elif re.search('([a-zA-Z]{2,6})[-]{0,1}([0-9]{2,5}).{3,}HD([1-9]{1})', filename):  # 匹配 '(SOE539)FULLHD1' 这样的分集
         return True
     elif re.search('([a-zA-Z]{2,6})[-]{0,1}([0-9]{2,5})HD-([1-9]{1})', filename):# 匹配 IPTD873HD-1.wmv 这样的分集
         return True
     elif re.search('([a-zA-Z]{2,6})0{2}([0-9]{3,5})-([0-9]{1})', filename):# 匹配 1dandy00386-0.mp4 这样的分集
         return True
+    elif re.search('([a-zA-Z]{2,6})-?([0-9]{3,5})hhb-([a-zA-Z]{1})', filename): # 匹配 iptd566hhb_B.wmv 这样的分集
+        return True
+    elif re.search('([0-9]{6}-[0-9]{3})-(.*)whole([0-9]{1})',filename):  #  匹配 090214_874-1pon-whole1_hd.mp4 这样的分集
+        return True
     else:
         return False
 
 def check_name(filename):  # 识别不规范的文件名
-    if any(ad in filename for ad in ads):   # 去掉3xplanet之类的广告字符
-        filename = filename.replace(next((ad for ad in ads if ad in filename)),'')
+    for ad in ads:
+        if ad in filename:
+            filename = filename.replace(ad,'')
     if '_' in filename:
         filename = filename.replace('_','-')
     if re.search('[a-zA-Z]{2,6}[0-9]{2,5}\.',filename):
         return True
     elif re.search('[a-zA-Z]{2,6}-{0,1}[0-9]{2,5}FHD', filename):
         return True
+    elif re.search('(heyzo).*([0-9]{4})', filename.lower()):  #  识别 heyzo_hd_1001_full.mp4
+        return True
+
 
 
 def format_part(filename):
@@ -55,8 +66,9 @@ def format_part(filename):
     try:
         if '_' in new_name:
             new_name = new_name.replace('_','-')
-        if any(ad in filename for ad in ads):  # 去掉3xplanet之类的广告字符
-            new_name = new_name.replace(next((ad for ad in ads if ad in new_name)), '')
+        for ad in ads:
+            if ad in new_name:
+                new_name = new_name.replace(ad, '')   # 去掉3xplanet之类的广告字符
         ####################   规范格式化分集  #########################
         if re.search('([a-zA-Z]{2,6}-[0-9]{2,5})-{0,1}([a-fA-F]{1})\.', new_name): # 匹配 MIDE-123B这样的分集
             serial = re.search('([a-zA-Z]{2,6}-[0-9]{2,5})-{0,1}([a-fA-F]{1})', new_name).group(1)  # 提取番号 MIDE-123
@@ -130,6 +142,26 @@ def format_part(filename):
                 new_name = serial_alph + '-' + serial_num + '-cd' + part
             else:
                 new_name = serial_alph + '-' + serial_num
+        elif re.search('([a-zA-Z]{2,6})-([0-9]{2,5}).{4,}-([a-gA-G]{1})\.',new_name):  # 匹配 SUPD-106 - DIGITAL CHANNEL DC106 石原莉奈-A.wmv 这样的分集
+            serial_alph = re.search('([a-zA-Z]{2,6})-([0-9]{2,5}).{4,}-([a-gA-G]{1})\.',new_name).group(1)
+            serial_num = re.search('([a-zA-Z]{2,6})-([0-9]{2,5}).{4,}-([a-gA-G]{1})\.',new_name).group(2)
+            part = re.search('([a-zA-Z]{2,6})-([0-9]{2,5}).{4,}-([a-gA-G]{1})\.',new_name).group(3)
+            new_name = serial_alph + '-' + serial_num + '-cd' + part.replace(part, mapping[part.lower()])
+            case = '13'
+        elif re.search('([a-zA-Z]{2,6})-?([0-9]{3,5})hhb-([a-zA-Z]{1})', new_name):  # 匹配 iptd566hhb_B.wmv 这样的分集
+            serial_alph = re.search('([a-zA-Z]{2,6})-?([0-9]{3,5})hhb-([a-zA-Z]{1})', new_name).group(1)
+            serial_num = re.search('([a-zA-Z]{2,6})-?([0-9]{3,5})hhb-([a-zA-Z]{1})', new_name).group(2)
+            part = re.search('([a-zA-Z]{2,6})-?([0-9]{3,5})hhb-([a-zA-Z]{1})', new_name).group(3)
+            new_name = serial_alph + '-' + serial_num + '-cd' + part.replace(part, mapping[part.lower()])
+            case = '14'
+
+        ####################   规范化无码分集  #########################
+        elif re.search('([0-9]{6}-[0-9]{3})-(.*)whole([0-9]{1})', new_name):  # 匹配 090214_874-1pon-whole1_hd.mp4 这样的分集
+            serial_num = re.search('([0-9]{6}-[0-9]{3})-(.*)whole([0-9]{1})', new_name).group(1)
+            part = re.search('([0-9]{6}-[0-9]{3})-(.*)whole([0-9]{1})', new_name).group(3)
+            new_name = serial_num.replace('-','_') + '-' + 'cd' + part
+            case = '15'
+
         ####################   规范格式化分集  #########################
 
         ####################   规范格式化名称  #########################
@@ -137,12 +169,17 @@ def format_part(filename):
             serial_alph = re.search('([a-zA-Z]{2,6})([0-9]{3,5})\.',new_name).group(1)
             serial_num = re.search('([a-zA-Z]{2,6})([0-9]{3,5})\.',new_name).group(2)
             new_name = serial_alph + '-' +serial_num
-            case = '13'
+            case = '16'
         elif re.search('[a-zA-Z]{2,6}-{0,1}[0-9]{2,5}FHD', new_name):  # 匹配 mide330FHD
             serial_alph = re.search('([a-zA-Z]{2,6})-{0,1}([0-9]{2,5})FHD',new_name).group(1)
             serial_num = re.search('([a-zA-Z]{2,6})-{0,1}([0-9]{2,5})FHD', new_name).group(2)
             new_name = serial_alph + '-' + serial_num
-            case = '14'
+            case = '17'
+        elif re.search('(heyzo).*([0-9]{4})', new_name.lower()):  # 识别 heyzo_hd_1001_full.mp4
+            serial_alph = re.search('(heyzo).*([0-9]{4})', new_name.lower()).group(1)
+            serial_num = re.search('(heyzo).*([0-9]{4})', new_name.lower()).group(2)
+            new_name = serial_alph + '-' + serial_num
+            case = '18'
     finally:
         return new_name, case
 
@@ -151,7 +188,7 @@ def format_part(filename):
 if __name__ == '__main__':
 
     try:
-        target_dir = r"Z:\781623489-20180821\KS-1_PT\佳苗るか"
+        target_dir = r"Y:\downloaded_HGST\aria2\downloads\temp"
         for filename in os.listdir(target_dir):
                 if not os.path.isdir(os.path.join(target_dir,filename)):
                     if check_part_format(filename) or check_name(filename):
@@ -162,7 +199,7 @@ if __name__ == '__main__':
     except:
         traceback.print_exc()
     '''
-    filename = '[FULL HD] SOE458 Fucking Blue Silliness.HD1.wmv'
+    filename = 'hjd2048.com_080119_878-1pon-1080p.mp4'
     if check_part_format(filename) or check_name(filename):
         print(format_part(filename))
     '''
