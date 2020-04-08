@@ -1269,8 +1269,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================从指定网站获取json_data
     def get_json_data(self, mode, number, config):
         if mode == 6:  # javdb模式
-            self.add_text_main('[!]Please Wait Three Seconds！')
-            time.sleep(3)
+            self.add_text_main('[!]Please Wait Two Seconds！')
+            time.sleep(2)
         json_data = getDataFromJSON(number, config, mode)
         return json_data
 

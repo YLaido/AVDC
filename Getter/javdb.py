@@ -256,10 +256,10 @@ def main_us(number):
             if re.search('\d{4}-\d{1,2}-\d{1,2}', date_get):
                 date_get = re.findall('\d{4}-\d{1,2}-\d{1,2}', date_get)[0]
             series_get = series_get.replace(' ', '')
-            if (series_get.upper() == number_series.upper() or series_get.replace('-',
-                                                                                  '').upper() == number_series.upper()) and number_date == date_get:
-                movie_found = 1
-                break
+            if (series_get.upper() == number_series.upper() or series_get.replace('-','').upper() == number_series.upper()):
+                if number_date == date_get or abs(int(number_date.split('-')[-1]) - int(date_get.split('-')[-1])) == 1:
+                    movie_found = 1
+                    break
         if movie_found == 0:
             raise Exception('Movie Data not found in javdb.main_us!')
         result_url = 'https://javdb.com' + html.xpath('//*[@id="videos"]/div/div/a/@href')[count - 1]
@@ -319,3 +319,4 @@ print(main('032020-001'))
 print(main('S2M-055'))
 print(main('LUXU-1217'))
 '''
+#print(main_us('blackedraw.19.01.02'))
